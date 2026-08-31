@@ -222,15 +222,40 @@
     };
 
     // Enviar UTMs junto com a venda para Black Cat (necessário para UTMify)
+    var uSource = '', uMedium = '', uCampaign = '', uContent = '', uTerm = '', uXcod = '', uSrc = '';
+    
+    // Tenta pegar da UTMify primeiro
     if (janela.utmParams && typeof janela.utmParams.get === 'function') {
       try {
-        payload.utm_source   = janela.utmParams.get('utm_source')   || '';
-        payload.utm_medium   = janela.utmParams.get('utm_medium')   || '';
-        payload.utm_campaign = janela.utmParams.get('utm_campaign') || '';
-        payload.utm_content  = janela.utmParams.get('utm_content')  || '';
-        payload.utm_term     = janela.utmParams.get('utm_term')     || '';
+        uSource   = janela.utmParams.get('utm_source')   || '';
+        uMedium   = janela.utmParams.get('utm_medium')   || '';
+        uCampaign = janela.utmParams.get('utm_campaign') || '';
+        uContent  = janela.utmParams.get('utm_content')  || '';
+        uTerm     = janela.utmParams.get('utm_term')     || '';
+        uXcod     = janela.utmParams.get('xcod')         || '';
+        uSrc      = janela.utmParams.get('src')          || '';
+      } catch (_) {}
+    } else {
+      // Fallback para a URL
+      try {
+        var params = new URLSearchParams(janela.location.search);
+        uSource   = params.get('utm_source')   || '';
+        uMedium   = params.get('utm_medium')   || '';
+        uCampaign = params.get('utm_campaign') || '';
+        uContent  = params.get('utm_content')  || '';
+        uTerm     = params.get('utm_term')     || '';
+        uXcod     = params.get('xcod')         || '';
+        uSrc      = params.get('src')          || '';
       } catch (_) {}
     }
+
+    if (uSource) payload.utm_source = uSource;
+    if (uMedium) payload.utm_medium = uMedium;
+    if (uCampaign) payload.utm_campaign = uCampaign;
+    if (uContent) payload.utm_content = uContent;
+    if (uTerm) payload.utm_term = uTerm;
+    if (uXcod) payload.xcod = uXcod;
+    if (uSrc) payload.src = uSrc;
 
     return janela.fetch('https://api.blackcatoficial.com/api/sales/create-sale', {
       method: 'POST',
