@@ -221,6 +221,17 @@
       }
     };
 
+    // Enviar UTMs junto com a venda para Black Cat (necessário para UTMify)
+    if (janela.utmParams && typeof janela.utmParams.get === 'function') {
+      try {
+        payload.utm_source   = janela.utmParams.get('utm_source')   || '';
+        payload.utm_medium   = janela.utmParams.get('utm_medium')   || '';
+        payload.utm_campaign = janela.utmParams.get('utm_campaign') || '';
+        payload.utm_content  = janela.utmParams.get('utm_content')  || '';
+        payload.utm_term     = janela.utmParams.get('utm_term')     || '';
+      } catch (_) {}
+    }
+
     return janela.fetch('https://api.blackcatoficial.com/api/sales/create-sale', {
       method: 'POST',
       headers: {
