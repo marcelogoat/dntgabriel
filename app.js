@@ -295,6 +295,19 @@
     if (el.campo) el.campo.value = codigo;
     if (el.aviso) el.aviso.textContent = 'Aguardando pagamento...';
 
+    // Disparar UTMify no momento da geração do PIX (ordem criada)
+    try {
+      if (typeof utmify === 'function') {
+        var valorEl = el.cifra ? el.cifra.textContent : '';
+        var nums = String(valorEl).replace(/[^0-9]/g, '');
+        var valorReaisUtm = parseInt(nums, 10) / 100;
+        utmify('track', 'Purchase', {
+          currency: 'BRL',
+          value: valorReaisUtm
+        });
+      }
+    } catch (_) {}
+
     ligarEscuta(id);
     estado.ocupado = false;
   }
