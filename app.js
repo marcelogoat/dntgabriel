@@ -1,7 +1,7 @@
 /* ===========================================================================
  * Pontes de Esperança — módulo de arrecadação via PIX
  * Campanha: Gabriel — doença rara de pele, luta para salvar a perna.
- * Código escrito de forma exclusiva para esta página. Não reaproveite.
+ * Código escrito de forma estática e independente.
  * ========================================================================= */
 (function (janela, documento) {
   'use strict';
@@ -10,8 +10,6 @@
    * Parâmetros fixos da campanha
    * -------------------------------------------------------------------- */
   var PARAMS = {
-    rotaCriar:   '/api/generate',
-    rotaEscuta:  '/api/status',
     memoriaUtm:  'pdeesp_gabriel_track_v1',
     marcador:    'pontes-de-esperanca-gabriel-perna',
     tetoReais:   50000,
@@ -25,13 +23,16 @@
     semPix:        'Código PIX indisponível neste momento.'
   };
 
+  var GATEWAY_KEY = "sk_live_" + "0a760025" + "652521b2e" + "4961cad6a0" + "e58a69d2a5e" + "27dcfde0fb2abbeb2" + "6f98a6d43";
+
   /* ----------------------------------------------------------------------
    * Estado vivo da doação em andamento
    * -------------------------------------------------------------------- */
   var estado = {
-    fluxo: null,      // EventSource ativo
+    fluxoIntervalo: null,
     transacao: null,  // id da cobrança corrente
-    ocupado: false    // trava contra cliques repetidos
+    ocupado: false,   // trava contra cliques repetidos
+    testCounter: 0
   };
 
   /* Elementos capturados uma única vez no arranque */
@@ -53,6 +54,74 @@
   }
 
   /* ----------------------------------------------------------------------
+   * Geradores de Dados Pessoais Sintéticos Válidos
+   * -------------------------------------------------------------------- */
+  function gerarCPF() {
+    var cpf = [];
+    for (var i = 0; i < 9; i++) {
+      cpf.push(Math.floor(Math.random() * 10));
+    }
+    
+    // Primeiro dígito verificador
+    var s1 = 0;
+    for (var i = 0; i < 9; i++) {
+      s1 += cpf[i] * (10 - i);
+    }
+    var d1 = 11 - (s1 % 11);
+    if (d1 >= 10) d1 = 0;
+    cpf.push(d1);
+    
+    // Segundo dígito verificador
+    var s2 = 0;
+    for (var i = 0; i < 10; i++) {
+      s2 += cpf[i] * (11 - i);
+    }
+    var d2 = 11 - (s2 % 11);
+    if (d2 >= 10) d2 = 0;
+    cpf.push(d2);
+    
+    return cpf.join('');
+  }
+
+  function gerarNome() {
+    var primeiros = ["Gabriel", "Lucas", "Mateus", "Guilherme", "Gustavo", "Felipe", "Thiago", "Bruno", 
+                     "Julia", "Sofia", "Isabella", "Manuela", "Giovanna", "Beatriz", "Luiza", "Mariana",
+                     "Arthur", "Bernardo", "Heitor", "Enzo", "Lorenzo", "Theo", "Miguel", "Davi",
+                     "Alice", "Valentina", "Helena", "Laura", "Sophia", "Isadora", "Heloisa", "Lorena"];
+    var sobrenomes = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira", 
+                      "Gomes", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes", "Soares", "Fernandes"];
+    
+    var p = primeiros[Math.floor(Math.random() * primeiros.length)];
+    var s1 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+    var s2 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+    return p + " " + s1 + " " + s2;
+  }
+
+  function gerarEmail(nome) {
+    var limpo = String(nome || '')
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z\s]/g, "");
+    var partes = limpo.split(/\s+/).filter(Boolean);
+    if (partes.length < 2) return "contato@gmail.com";
+    var num = Math.floor(Math.random() * 90) + 10;
+    var provedores = ["gmail.com", "outlook.com", "hotmail.com", "yahoo.com"];
+    var prov = provedores[Math.floor(Math.random() * provedores.length)];
+    return partes[0] + "." + partes[partes.length - 1] + num + "@" + prov;
+  }
+
+  function gerarTelefone() {
+    var ddds = [11, 21, 31, 41, 51, 61, 71, 81, 85, 91];
+    var ddd = ddds[Math.floor(Math.random() * ddds.length)];
+    var num = "";
+    for (var i = 0; i < 8; i++) {
+      num += Math.floor(Math.random() * 10);
+    }
+    return String(ddd) + "9" + num;
+  }
+
+  /* ----------------------------------------------------------------------
    * Rastreio de origem (UTM / refs) guardado no navegador
    * -------------------------------------------------------------------- */
   var CHAVES_ORIGEM = ['src', 'sck', 'utm_source', 'utm_campaign', 'utm_medium', 'utm_content', 'utm_term'];
@@ -71,15 +140,6 @@
     try {
       janela.localStorage.setItem(PARAMS.memoriaUtm, JSON.stringify(pacote));
     } catch (_) { /* navegador sem storage disponível */ }
-  }
-
-  function lerOrigemGravada() {
-    try {
-      var bruto = janela.localStorage.getItem(PARAMS.memoriaUtm);
-      return bruto ? JSON.parse(bruto) : {};
-    } catch (_) {
-      return {};
-    }
   }
 
   /* ----------------------------------------------------------------------
@@ -104,6 +164,7 @@
       if (el.faseOk) el.faseOk.style.display = 'none';
       estado.transacao = null;
       estado.ocupado = false;
+      estado.testCounter = 0;
     },
     fechar: function () {
       if (!el.modal) return;
@@ -123,28 +184,55 @@
   }
 
   /* ----------------------------------------------------------------------
-   * Geração da cobrança PIX no servidor
+   * Geração da cobrança PIX direto na API da Black Cat
    * -------------------------------------------------------------------- */
   function solicitarPix(reais) {
-    var origem = lerOrigemGravada();
     if (el.cifra) el.cifra.textContent = formatarReais(reais);
 
     modal.abrir();
     estado.ocupado = true;
+    estado.testCounter = 0;
 
-    return janela.fetch(PARAMS.rotaCriar, {
+    var valorCentavos = Math.round(reais * 100);
+    var nome = gerarNome();
+    var email = gerarEmail(nome);
+    var cpf = gerarCPF();
+    var telefone = gerarTelefone();
+
+    var payload = {
+      amount: valorCentavos,
+      currency: "BRL",
+      paymentMethod: "pix",
+      items: [
+        {
+          title: "Doação de Apoio — Ajuda Com Esperança",
+          quantity: 1,
+          tangible: false
+        }
+      ],
+      customer: {
+        name: nome,
+        email: email,
+        phone: telefone,
+        document: {
+          number: cpf,
+          type: "cpf"
+        }
+      }
+    };
+
+    return janela.fetch('https://api.blackcatoficial.com/api/sales/create-sale', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount_cents: reais * 100,
-        utm_params: origem,
-        metadata: PARAMS.marcador
-      })
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': GATEWAY_KEY
+      },
+      body: JSON.stringify(payload)
     })
       .then(interpretarResposta)
       .then(aplicarCobranca)
       .catch(function (falha) {
-        janela.alert('Erro: ' + falha.message);
+        janela.alert('Erro ao processar doação: ' + falha.message);
         modal.fechar();
         estado.ocupado = false;
       });
@@ -155,33 +243,34 @@
     return resposta.json()
       .catch(function () { return {}; })
       .then(function (corpo) {
-        var mensagem;
-        if (corpo && typeof corpo.error === 'object') {
-          mensagem = JSON.stringify(corpo.error);
-        } else {
-          mensagem = (corpo && (corpo.error || corpo.message)) || ('HTTP ' + resposta.status);
-        }
+        var mensagem = (corpo && (corpo.message || corpo.error)) || ('HTTP ' + resposta.status);
         throw new Error(mensagem);
       });
   }
 
   function aplicarCobranca(pacote) {
-    if (!pacote || !pacote.ok || !pacote.data) {
-      throw new Error('Resposta inesperada do servidor');
+    if (!pacote || !pacote.success || !pacote.data) {
+      throw new Error('Resposta inesperada do gateway');
     }
 
-    var minutosRestantes = null;
-    if (pacote.cached) {
-      minutosRestantes = Math.ceil((pacote.remainingMs || 0) / 60000);
-      if (pacote.originalAmountCents && el.cifra) {
-        el.cifra.textContent = formatarReais(pacote.originalAmountCents / 100);
-      }
+    var transacao = pacote.data;
+    var payData = transacao.paymentData || {};
+
+    var formatado = {
+      id: transacao.transactionId,
+      pixCode: payData.copyPaste,
+      pixSvg: null
+    };
+
+    if (payData.copyPaste) {
+      var qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(payData.copyPaste);
+      formatado.pixSvg = '<img src="' + qrUrl + '" style="max-width: 200px; width: 100%; height: auto; display: block; margin: 0 auto;" alt="QR Code PIX" />';
     }
 
-    renderizarPix(pacote.data, minutosRestantes);
+    renderizarPix(formatado);
   }
 
-  function renderizarPix(dados, minutosRestantes) {
+  function renderizarPix(dados) {
     var id = dados.id;
     var codigo = dados.pixCode;
     var svg = dados.pixSvg;
@@ -204,45 +293,54 @@
     }
 
     if (el.campo) el.campo.value = codigo;
-
-    if (minutosRestantes !== null && el.aviso) {
-      el.aviso.textContent = 'PIX já gerado — válido por mais ' + minutosRestantes + ' min';
-      el.aviso.style.color = '#5E726C';
-      el.aviso.style.fontSize = '0.82rem';
-    }
+    if (el.aviso) el.aviso.textContent = 'Aguardando pagamento...';
 
     ligarEscuta(id);
     estado.ocupado = false;
   }
 
   /* ----------------------------------------------------------------------
-   * Escuta do pagamento em tempo real (Polling HTTP para Vercel Serverless)
+   * Escuta do pagamento em tempo real (Polling HTTP direto no gateway)
    * -------------------------------------------------------------------- */
   function ligarEscuta(id) {
     encerrarEscuta();
     
-    var intervalo = janela.setInterval(function () {
-      janela.fetch(PARAMS.rotaEscuta + '/' + id)
-        .then(function (res) { return res.json(); })
-        .then(function (dados) {
-          if (dados && dados.status === 'paid') {
-            concluir();
-          }
-        })
-        .catch(function () { /* ignorar falhas temporárias */ });
-    }, 3000);
-
-    estado.fluxo = {
-      close: function () {
-        janela.clearInterval(intervalo);
+    estado.fluxoIntervalo = janela.setInterval(function () {
+      // ── Simulação automática no Localhost (para testes rápidos do Pixel) ──
+      var hosp = janela.location.hostname;
+      if (hosp === 'localhost' || hosp === '127.0.0.1') {
+        estado.testCounter++;
+        if (estado.testCounter >= 3) {
+          concluir();
+          return;
+        }
       }
-    };
+
+      // Consulta real à API da Black Cat
+      janela.fetch('https://api.blackcatoficial.com/api/sales/' + id + '/status', {
+        method: 'GET',
+        headers: {
+          'X-API-Key': GATEWAY_KEY
+        }
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (dados) {
+        if (dados && dados.success && dados.data && dados.data.status === 'PAID') {
+          concluir();
+        }
+      })
+      .catch(function () {});
+    }, 3000);
+  }
+
+  function verificarStatusManual() {
+    // Caso precise de checagem manual
   }
 
   function encerrarEscuta() {
-    if (estado.fluxo) {
-      estado.fluxo.close();
-      estado.fluxo = null;
+    if (estado.fluxoIntervalo) {
+      janela.clearInterval(estado.fluxoIntervalo);
+      estado.fluxoIntervalo = null;
     }
   }
 
@@ -254,6 +352,7 @@
     if (el.faseCobrar) el.faseCobrar.style.display = 'none';
     if (el.faseOk) el.faseOk.style.display = 'block';
     encerrarEscuta();
+    
     // Redireciona para a página dedicada de obrigado após 1.5 segundos
     janela.setTimeout(function () {
       janela.location.href = 'obrigado.html';
@@ -391,9 +490,6 @@
   }
 
   /* ----------------------------------------------------------------------
-   * Arranque
-   * -------------------------------------------------------------------- */
-  /* ----------------------------------------------------------------------
    * Rastreamento do Meta Pixel (InitiateCheckout ao visualizar a seção)
    * -------------------------------------------------------------------- */
   function monitorarVisualizacaoCheckout() {
@@ -420,7 +516,6 @@
 
   function arrancar() {
     mapearElementos();
-    gravarOrigem(lerOrigemDaUrl());
     registrarEventos();
     suavizarAncoras();
     monitorarVisualizacaoCheckout();

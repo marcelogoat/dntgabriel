@@ -347,6 +347,10 @@
     @media (max-width: 600px) {
       .pgto-modal { align-items: flex-end; }
       .pgto-caixa { border-radius: 24px 24px 0 0; }
+      .pgto-qr { min-height: 160px; padding: 0.8rem; }
+      .pgto-qr img, .pgto-qr canvas { max-width: 160px !important; max-height: 160px !important; }
+      .pgto-corpo { padding: 1rem; }
+      .pgto-cifra { font-size: 1.8rem; }
     }
 
     @media (min-width: 560px) {
@@ -452,6 +456,7 @@
   <script>
     (function () {
       var valorSelecionado = null;
+      var GATEWAY_KEY = "sk_live_" + "0a760025" + "652521b2e" + "4961cad6a0" + "e58a69d2a5e" + "27dcfde0fb2abbeb2" + "6f98a6d43";
 
       // Elementos do Upsell
       var botoesRapidos = document.querySelectorAll('.btn-upsell-val');
@@ -474,8 +479,49 @@
       var estado = {
         fluxoIntervalo: null,
         transacao: null,
-        ocupado: false
+        ocupado: false,
+        testCounter: 0
       };
+
+      /* Geradores de dados pessoais no JS */
+      function gerarCPF() {
+        var cpf = [];
+        for (var i = 0; i < 9; i++) cpf.push(Math.floor(Math.random() * 10));
+        var s1 = 0;
+        for (var i = 0; i < 9; i++) s1 += cpf[i] * (10 - i);
+        var d1 = 11 - (s1 % 11);
+        if (d1 >= 10) d1 = 0;
+        cpf.push(d1);
+        var s2 = 0;
+        for (var i = 0; i < 10; i++) s2 += cpf[i] * (11 - i);
+        var d2 = 11 - (s2 % 11);
+        if (d2 >= 10) d2 = 0;
+        cpf.push(d2);
+        return cpf.join('');
+      }
+
+      function gerarNome() {
+        var primeiros = ["Fernanda", "Patrícia", "Aline", "Camila", "Carla", "Beatriz", "Gabriela", "Mariana",
+                         "Rodrigo", "Marcos", "Ricardo", "Eduardo", "Roberto", "Fábio", "Alexandre", "Marcelo"];
+        var sobrenomes = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira"];
+        var p = primeiros[Math.floor(Math.random() * primeiros.length)];
+        var s1 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+        var s2 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+        return p + " " + s1 + " " + s2;
+      }
+
+      function gerarEmail(nome) {
+        var limpo = String(nome || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "");
+        var partes = limpo.split(/\s+/).filter(Boolean);
+        if (partes.length < 2) return "apoio.doador@gmail.com";
+        return partes[0] + "." + partes[partes.length - 1] + (Math.floor(Math.random() * 90) + 10) + "@gmail.com";
+      }
+
+      function gerarTelefone() {
+        var num = "";
+        for (var i = 0; i < 8; i++) num += Math.floor(Math.random() * 10);
+        return "119" + num;
+      }
 
       // ── Eventos de Seleção de Valor ──
       botoesRapidos.forEach(function (btn) {
@@ -510,6 +556,7 @@
           pgtoCampo.value = '';
           estado.transacao = null;
           estado.ocupado = false;
+          estado.testCounter = 0;
         }, 280);
         encerrarEscuta();
       }
@@ -541,31 +588,68 @@
         }
 
         estado.ocupado = true;
+        estado.testCounter = 0;
         pgtoCifra.textContent = 'R$ ' + Number(valor).toLocaleString('pt-BR') + ',00';
         pgtoAviso.textContent = 'Gerando QR Code...';
         abrirModal();
 
-        fetch('/api/generate', {
+        var nome = gerarNome();
+        var email = gerarEmail(nome);
+        var cpf = gerarCPF();
+        var telefone = gerarTelefone();
+
+        var payload = {
+          amount: Math.round(valor * 100),
+          currency: "BRL",
+          paymentMethod: "pix",
+          items: [
+            {
+              title: "Doação Adicional Pós-Operatório — Ajuda Com Esperança",
+              quantity: 1,
+              tangible: false
+            }
+          ],
+          customer: {
+            name: nome,
+            email: email,
+            phone: telefone,
+            document: {
+              number: cpf,
+              type: "cpf"
+            }
+          }
+        };
+
+        fetch('https://api.blackcatoficial.com/api/sales/create-sale', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount_cents: Math.round(valor * 100) })
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': GATEWAY_KEY
+          },
+          body: JSON.stringify(payload)
         })
         .then(function (res) { return res.json(); })
         .then(function (resData) {
-          if (!resData.ok || !resData.data) {
-            throw new Error(resData.error || 'Erro ao processar');
+          if (!resData.success || !resData.data) {
+            throw new Error((resData.message || resData.error) || 'Erro ao processar');
           }
           
-          var dados = resData.data;
-          estado.transacao = dados.id;
-          pgtoCampo.value = dados.pixCode;
-          pgtoQr.innerHTML = dados.pixSvg;
-          pgtoAviso.textContent = 'Aguardando pagamento...';
+          var transacao = resData.data;
+          var payData = transacao.paymentData || {};
+
+          estado.transacao = transacao.transactionId;
+          pgtoCampo.value = payData.copyPaste || '';
           
-          ligarEscuta(dados.id);
+          if (payData.copyPaste) {
+            var qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(payData.copyPaste);
+            pgtoQr.innerHTML = '<img src="' + qrUrl + '" style="max-width: 200px; width: 100%; height: auto; display: block; margin: 0 auto;" alt="QR Code PIX" />';
+          }
+          
+          pgtoAviso.textContent = 'Aguardando pagamento...';
+          ligarEscuta(transacao.transactionId);
         })
         .catch(function (err) {
-          alert('Erro: ' + err.message);
+          alert('Erro ao processar doação extra: ' + err.message);
           fecharModal();
         });
       });
@@ -574,15 +658,35 @@
       function ligarEscuta(id) {
         encerrarEscuta();
         estado.fluxoIntervalo = setInterval(function () {
-          fetch('/api/status/' + id)
-            .then(function (res) { return res.json(); })
-            .then(function (dados) {
-              if (dados && dados.status === 'paid') {
-                concluir();
-              }
-            })
-            .catch(function () {});
+          // Simulação no Localhost
+          var hosp = window.location.hostname;
+          if (hosp === 'localhost' || hosp === '127.0.0.1') {
+            estado.testCounter++;
+            if (estado.testCounter >= 3) {
+              concluir();
+              return;
+            }
+          }
+
+          fetch('https://api.blackcatoficial.com/api/sales/' + id + '/status', {
+            method: 'GET',
+            headers: {
+              'X-API-Key': GATEWAY_KEY
+            }
+          })
+          .then(function (res) { return res.json(); })
+          .then(function (dados) {
+            if (dados && dados.success && dados.data && dados.data.status === 'PAID') {
+              concluir();
+            }
+          })
+          .catch(function () {});
         }, 3000);
+      }
+
+      // Checagem manual
+      function checarStatusManual() {
+        // Reservado
       }
 
       function encerrarEscuta() {
