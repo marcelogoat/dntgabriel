@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1097845396008408');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1097845396008408&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muito Obrigado! | Ajuda Com Esperança</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&amp;family=Nunito+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --pinho:       #0B6A56;
+      --pinho-esc:   #064034;
+      --pinho-viv:   #0EA385;
+      --salvia:      #4C9F8F;
+      --salvia-clr:  #E6F3F0;
+      --salvia-med:  #A9D8CE;
+      --salvia-nev:  #F0F7F5;
+      --ambar:       #F2A900;
+      --ambar-frt:   #C68A00;
+      --areia:       #FAF8F5;
+      --cartao:      #FFFFFF;
+      --contorno:    #E7E4DC;
+      --tinta:       #1C2A26;
+      --tinta-med:   #556863;
+      --flor:        #E2747D;
+      --flor-frt:    #C1454E;
+      --flor-clr:    #FDF0F1;
+    }
+
+    body {
+      font-family: 'Nunito Sans', system-ui, sans-serif;
+      background: var(--areia);
+      color: var(--tinta);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Cabeçalho ── */
+    .cabecalho {
+      width: 100%;
+      border-bottom: 1px solid var(--contorno);
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--cartao);
+      gap: 0.85rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .cabecalho-logo { 
+      height: 48px; 
+      width: 48px; 
+      object-fit: cover; 
+      border-radius: 50%;
+      border: 2px solid var(--salvia-med);
+    }
+    .cabecalho-marca {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.15rem; font-weight: 700;
+      letter-spacing: -0.01em; line-height: 1.1;
+      color: var(--pinho-esc);
+    }
+    .cabecalho-marca span {
+      display: block; font-style: normal;
+      font-family: 'Nunito Sans', sans-serif;
+      font-weight: 700; font-size: 0.55rem; color: var(--ambar-frt);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.15rem;
+    }
+
+    /* ── Bloco Central ── */
+    .miolo {
+      max-width: 540px;
+      width: 100%;
+      padding: 2rem 1.1rem;
+      margin: auto;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--cartao);
+      border: 1px solid var(--contorno);
+      border-radius: 24px;
+      padding: 2.2rem 1.8rem;
+      box-shadow: 0 10px 30px rgba(11, 106, 86, 0.04);
+      margin-bottom: 1.5rem;
+    }
+
+    .icone-sucesso {
+      width: 64px;
+      height: 64px;
+      background: var(--salvia-clr);
+      color: var(--pinho);
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 1.25rem;
+      border: 2px solid var(--salvia-med);
+    }
+
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--pinho-esc);
+      margin-bottom: 0.75rem;
+      line-height: 1.25;
+    }
+
+    p.agradecimento {
+      font-size: 0.94rem;
+      color: var(--tinta-med);
+      line-height: 1.7;
+      margin-bottom: 0;
+    }
+
+    /* ── Card de Upsell ── */
+    .card-upsell {
+      background: var(--salvia-nev);
+      border: 2px solid var(--salvia-med);
+      border-radius: 24px;
+      padding: 2.2rem 1.8rem;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(11, 106, 86, 0.03);
+      margin-bottom: 1.5rem;
+    }
+
+    .upsell-header {
+      display: inline-block;
+      background: var(--ambar);
+      color: var(--pinho-esc);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.32rem 0.9rem;
+      border-radius: 99px;
+      margin-bottom: 1rem;
+    }
+
+    .card-upsell h2 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--pinho-esc);
+      margin-bottom: 0.85rem;
+      line-height: 1.3;
+    }
+
+    .card-upsell p {
+      font-size: 0.92rem;
+      color: var(--tinta);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Escolha de valores do upsell */
+    .upsell-valores {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .btn-upsell-val {
+      background: var(--cartao);
+      color: var(--pinho-esc);
+      border: 2px solid var(--salvia-med);
+      padding: 0.8rem 0.5rem;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-upsell-val:hover {
+      background: var(--salvia-clr);
+      border-color: var(--pinho);
+    }
+
+    .btn-upsell-val.ativo {
+      background: var(--pinho);
+      color: #fff;
+      border-color: var(--pinho);
+      box-shadow: 0 4px 12px rgba(11, 106, 86, 0.2);
+    }
+
+    .upsell-custom {
+      display: flex;
+      align-items: center;
+      background: var(--cartao);
+      border: 2px solid var(--salvia-med);
+      border-radius: 12px;
+      padding: 0.55rem 0.8rem;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .upsell-custom:focus-within {
+      border-color: var(--pinho);
+    }
+
+    .upsell-custom span {
+      font-weight: 800;
+      color: var(--pinho-esc);
+      font-size: 0.95rem;
+      margin-right: 0.4rem;
+    }
+
+    .upsell-custom input {
+      border: none;
+      background: none;
+      outline: none;
+      width: 100%;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--tinta);
+    }
+
+    .btn-upsell-submit {
+      background: linear-gradient(135deg, var(--pinho-viv), var(--pinho));
+      color: #fff;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(11, 106, 86, 0.25);
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+    }
+
+    .btn-upsell-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(11, 106, 86, 0.35);
+      filter: brightness(1.06);
+    }
+
+    .btn-upsell-submit:active {
+      transform: scale(0.98) translateY(0);
+    }
+
+    .btn-voltar {
+      display: block;
+      background: none;
+      color: var(--tinta-med);
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: underline;
+      border: none;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: color 0.2s;
+    }
+
+    .btn-voltar:hover {
+      color: var(--pinho-esc);
+    }
+
+    /* ── Rodapé ── */
+    .base {
+      width: 100%;
+      border-top: 1px solid var(--contorno);
+      background: var(--cartao);
+      color: var(--tinta-med);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+    .base strong {
+      color: var(--pinho-esc);
+    }
+
+    /* ── Modal PIX ── */
+    .pgto-modal {
+      display: none; position: fixed; inset: 0;
+      z-index: 9999; justify-content: center; align-items: flex-end;
+    }
+    .pgto-fundo {
+      position: absolute; inset: 0;
+      background: rgba(6,64,52,0.5); backdrop-filter: blur(4px);
+    }
+    .pgto-caixa {
+      position: relative; background: #fff;
+      border-radius: 24px 24px 0 0;
+      width: 100%; max-width: 560px; max-height: 92vh;
+      overflow-y: auto; z-index: 1; margin: 0 auto;
+      animation: pgtoSobe 0.28s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes pgtoSobe { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .pgto-alca { width: 36px; height: 4px; background: var(--salvia-clr); border-radius: 99px; margin: 0.65rem auto 0; }
+    .pgto-topo {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--contorno);
+    }
+    .pgto-topo h3 { font-size: 0.92rem; font-weight: 800; color: var(--pinho-esc); }
+    .pgto-sair { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--tinta-med); line-height: 1; padding: 0.2rem; }
+    .pgto-corpo { padding: 1.3rem; text-align: center; }
+    .pgto-cifra { font-size: 2.05rem; font-weight: 800; color: var(--pinho); margin-bottom: 0.2rem; }
+    .pgto-aviso { font-size: 0.8rem; color: var(--tinta-med); margin-bottom: 1rem; min-height: 1.2em; }
+    .pgto-qr { display: flex; justify-content: center; align-items: center; min-height: 200px; background: var(--salvia-clr); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+    .pgto-qr img { max-width: 200px; max-height: 200px; }
+    .pgto-linha { margin-bottom: 1rem; }
+    .pgto-linha label { display: block; font-size: 0.74rem; font-weight: 700; color: var(--tinta-med); margin-bottom: 0.4rem; text-align: left; }
+    .pgto-campo-linha { display: flex; gap: 0.45rem; }
+    .pgto-campo { flex: 1; padding: 0.65rem 0.8rem; border: 1px solid var(--contorno); border-radius: 10px; font-size: 0.72rem; font-family: monospace; color: var(--tinta); background: var(--salvia-clr); outline: none; }
+    .pgto-copiar { padding: 0.65rem 1rem; background: var(--pinho); color: #fff; border: none; border-radius: 10px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+    .pgto-copiar:hover { background: var(--pinho-esc); }
+    .pgto-guia { background: var(--salvia-clr); border-radius: 12px; padding: 0.85rem 1rem; font-size: 0.77rem; color: var(--tinta-med); text-align: left; line-height: 1.7; }
+    .pgto-guia strong { color: var(--tinta); }
+    .pgto-ok { display: none; text-align: center; padding: 2.6rem 1.5rem; }
+    .pgto-ok-icone { font-size: 3.3rem; margin-bottom: 0.75rem; }
+    .pgto-ok h3 { font-size: 1.25rem; font-weight: 800; color: var(--pinho); margin-bottom: 0.5rem; }
+    .pgto-ok p { font-size: 0.89rem; color: var(--tinta-med); line-height: 1.65; }
+
+    @media (max-width: 600px) {
+      .pgto-modal { align-items: flex-end; }
+      .pgto-caixa { border-radius: 24px 24px 0 0; }
+    }
+
+    @media (min-width: 560px) {
+      .pgto-modal { align-items: center; padding: 1rem; }
+      .pgto-caixa { border-radius: 18px; max-height: 88vh; }
+      .pgto-alca { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="cabecalho">
+    <img src="img/logo-ajuda-com-esperanca.jpg" alt="Ajuda Com Esperança" class="cabecalho-logo">
+    <div class="cabecalho-marca">
+      Ajuda Com Esperança
+      <span>Campanha Oficial</span>
+    </div>
+  </header>
+
+  <main class="miolo">
+    <!-- Bloco 1: Agradecimento de Doação Inicial -->
+    <div class="card">
+      <div class="icone-sucesso">🤝</div>
+      <h1>Muito obrigado!</h1>
+      <p class="agradecimento">
+        Sua primeira doação foi confirmada e o procedimento na perna do Gabriel está garantido! Sua solidariedade traz alívio imediato para toda a família nesta luta contra a dor.
+      </p>
+    </div>
+
+    <!-- Bloco 2: Seção de Upsell -->
+    <div class="card-upsell">
+      <span class="upsell-header">🩹 Ajude com o Pós-Operatório</span>
+      <h2>Você pode dar um passo extra de amor hoje?</h2>
+      <p>
+        Para garantir a cicatrização e evitar infecções no pós-operatório, Gabriel precisará de <strong>pomadas dermatológicas especiais importadas e ataduras de alta absorção que não colam na pele</strong> (itens de alto custo não cobertos pelo tratamento básico). Gostaria de doar uma pequena quantia extra para cobrir esse cuidado diário?
+      </p>
+      
+      <div class="upsell-valores">
+        <button class="btn-upsell-val" data-valor="15">+ R$ 15</button>
+        <button class="btn-upsell-val" data-valor="25">+ R$ 25</button>
+        <button class="btn-upsell-val" data-valor="50">+ R$ 50</button>
+      </div>
+
+      <div class="upsell-custom">
+        <span>R$</span>
+        <input type="number" id="upsell-custom-val" placeholder="Outro valor..." min="1" step="any">
+      </div>
+
+      <button id="btn-upsell-submit" class="btn-upsell-submit">
+        Confirmar Doação Extra 💚
+      </button>
+
+      <a href="index.html" class="btn-voltar">
+        Voltar à página inicial
+      </a>
+    </div>
+  </main>
+
+  <footer class="base">
+    <strong>Ajuda Com Esperança</strong> · Mais doações, mais possibilidades.<br>
+    Organizado em parceria com a família do Gabriel<br>
+    © 2026 — Todos os direitos reservados
+  </footer>
+
+  <!-- Modal PIX -->
+  <div id="pgto-modal" class="pgto-modal" aria-hidden="true" role="dialog" aria-label="Pagamento via PIX">
+    <div class="pgto-fundo"></div>
+    <div class="pgto-caixa">
+      <div class="pgto-alca"></div>
+      <div id="pgto-fase-cobranca">
+        <div class="pgto-topo">
+          <h3>Doação Adicional via PIX</h3>
+          <button id="pgto-fechar" class="pgto-sair" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="pgto-corpo">
+          <div class="pgto-cifra" id="pgto-cifra">R$ 0,00</div>
+          <div class="pgto-aviso" id="pgto-aviso">Gerando QR Code...</div>
+          <div class="pgto-qr" id="pgto-qr"></div>
+          <div class="pgto-linha">
+            <label for="pgto-campo">Copie o código PIX:</label>
+            <div class="pgto-campo-linha">
+              <input type="text" id="pgto-campo" class="pgto-campo" readonly placeholder="Aguardando...">
+              <button id="pgto-copiar" class="pgto-copiar">COPIAR</button>
+            </div>
+          </div>
+          <div class="pgto-guia">
+            <strong>Como pagar:</strong><br>
+            1. Abra o app do seu banco<br>
+            2. Escolha PIX → QR Code ou Copia e Cola<br>
+            3. Escaneie ou cole o código<br>
+            4. Confirme o pagamento
+          </div>
+        </div>
+      </div>
+      <div id="pgto-fase-ok" class="pgto-ok">
+        <div class="pgto-ok-icone">💚</div>
+        <h3>Obrigado em Dobro!</h3>
+        <p>Sua doação extra foi confirmada com sucesso. Com esse gesto adicional, você garante que o Gabriel terá todo o alívio, pomadas e curativos necessários para a cicatrização pós-cirúrgica.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var valorSelecionado = null;
+
+      // Elementos do Upsell
+      var botoesRapidos = document.querySelectorAll('.btn-upsell-val');
+      var inputCustomizado = document.getElementById('upsell-custom-val');
+      var botaoSubmit = document.getElementById('btn-upsell-submit');
+
+      // Elementos do Modal
+      var modal = document.getElementById('pgto-modal');
+      var modalFundo = document.querySelector('.pgto-fundo');
+      var modalFechar = document.getElementById('pgto-fechar');
+      var pgtoCifra = document.getElementById('pgto-cifra');
+      var pgtoAviso = document.getElementById('pgto-aviso');
+      var pgtoQr = document.getElementById('pgto-qr');
+      var pgtoCampo = document.getElementById('pgto-campo');
+      var pgtoCopiar = document.getElementById('pgto-copiar');
+      var faseCobrar = document.getElementById('pgto-fase-cobranca');
+      var faseOk = document.getElementById('pgto-fase-ok');
+
+      // Estado do pagamento
+      var estado = {
+        fluxoIntervalo: null,
+        transacao: null,
+        ocupado: false
+      };
+
+      // ── Eventos de Seleção de Valor ──
+      botoesRapidos.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          botoesRapidos.forEach(function (b) { b.classList.remove('ativo'); });
+          btn.classList.add('ativo');
+          inputCustomizado.value = ''; // Limpa customizado
+          valorSelecionado = parseInt(btn.getAttribute('data-valor'), 10);
+        });
+      });
+
+      inputCustomizado.addEventListener('input', function () {
+        botoesRapidos.forEach(function (b) { b.classList.remove('ativo'); });
+        valorSelecionado = parseFloat(inputCustomizado.value) || null;
+      });
+
+      // ── Eventos do Modal ──
+      function abrirModal() {
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function fecharModal() {
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(function () {
+          modal.style.display = 'none';
+          faseCobrar.style.display = 'block';
+          faseOk.style.display = 'none';
+          pgtoQr.innerHTML = '';
+          pgtoCampo.value = '';
+          estado.transacao = null;
+          estado.ocupado = false;
+        }, 280);
+        encerrarEscuta();
+      }
+
+      modalFechar.addEventListener('click', fecharModal);
+      modalFundo.addEventListener('click', fecharModal);
+
+      // Copiar código PIX
+      pgtoCopiar.addEventListener('click', function () {
+        var cod = pgtoCampo.value;
+        if (!cod) return;
+        navigator.clipboard.writeText(cod).then(function () {
+          var antigo = pgtoCopiar.innerHTML;
+          pgtoCopiar.innerHTML = 'COPIADO!';
+          setTimeout(function () { pgtoCopiar.innerHTML = antigo; }, 2000);
+        }).catch(function () {
+          pgtoCampo.select();
+        });
+      });
+
+      // ── Requisição do PIX de Upsell ──
+      botaoSubmit.addEventListener('click', function () {
+        if (estado.ocupado) return;
+        
+        var valor = valorSelecionado;
+        if (!valor || isNaN(valor) || valor <= 0) {
+          alert('Por favor, escolha ou digite um valor válido para doar.');
+          return;
+        }
+
+        estado.ocupado = true;
+        pgtoCifra.textContent = 'R$ ' + Number(valor).toLocaleString('pt-BR') + ',00';
+        pgtoAviso.textContent = 'Gerando QR Code...';
+        abrirModal();
+
+        fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount_cents: Math.round(valor * 100) })
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (resData) {
+          if (!resData.ok || !resData.data) {
+            throw new Error(resData.error || 'Erro ao processar');
+          }
+          
+          var dados = resData.data;
+          estado.transacao = dados.id;
+          pgtoCampo.value = dados.pixCode;
+          pgtoQr.innerHTML = dados.pixSvg;
+          pgtoAviso.textContent = 'Aguardando pagamento...';
+          
+          ligarEscuta(dados.id);
+        })
+        .catch(function (err) {
+          alert('Erro: ' + err.message);
+          fecharModal();
+        });
+      });
+
+      // ── Monitoramento do Pagamento (Polling) ──
+      function ligarEscuta(id) {
+        encerrarEscuta();
+        estado.fluxoIntervalo = setInterval(function () {
+          fetch('/api/status/' + id)
+            .then(function (res) { return res.json(); })
+            .then(function (dados) {
+              if (dados && dados.status === 'paid') {
+                concluir();
+              }
+            })
+            .catch(function () {});
+        }, 3000);
+      }
+
+      function encerrarEscuta() {
+        if (estado.fluxoIntervalo) {
+          clearInterval(estado.fluxoIntervalo);
+          estado.fluxoIntervalo = null;
+        }
+      }
+
+      function concluir() {
+        encerrarEscuta();
+        faseCobrar.style.display = 'none';
+        faseOk.style.display = 'block';
+        setTimeout(fecharModal, 4500); // Fecha após 4.5 segundos
+      }
+    })();
+  </script>
+</body>
+</html>

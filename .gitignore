@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+hts-cache/
+hts-log.txt
+.gemini/
+.git/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
