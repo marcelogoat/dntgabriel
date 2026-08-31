@@ -12,9 +12,17 @@ class VercelPathMiddleware(object):
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
     def __call__(self, environ, start_response):
-        matched_path = environ.get('HTTP_X_MATCHED_PATH')
-        if matched_path:
-            environ['PATH_INFO'] = matched_path
+        # x-vercel-forwarded-path contem o caminho original (ex: /api/generate)
+        original_path = environ.get('HTTP_X_VERCEL_FORWARDED_PATH')
+        if not original_path:
+            # Fallback para REQUEST_URI se o cabeçalho acima nao estiver disponivel
+            original_path = environ.get('REQUEST_URI')
+            if original_path and '?' in original_path:
+                original_path = original_path.split('?')[0]
+        
+        if original_path:
+            environ['PATH_INFO'] = original_path
+            
         return self.wsgi_app(environ, start_response)
 
 app.wsgi_app = VercelPathMiddleware(app.wsgi_app)
