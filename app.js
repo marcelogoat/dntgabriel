@@ -377,9 +377,9 @@
 
       // Disparar no UTMify
       if (typeof utmify === 'function') {
-        utmify('event', 'Purchase', {
+        utmify('track', 'Purchase', {
           currency: 'BRL',
-          value: valorCentavos
+          value: valorReais
         });
       }
     } catch (_) { /* rastreio é opcional */ }
