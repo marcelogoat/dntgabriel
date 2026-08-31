@@ -7,6 +7,18 @@ from flask import Flask, request, jsonify, send_from_directory
 
 app = Flask(__name__)
 
+# Middleware para corrigir o PATH_INFO na Vercel (evita erro 405/404)
+class VercelPathMiddleware(object):
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+    def __call__(self, environ, start_response):
+        matched_path = environ.get('HTTP_X_MATCHED_PATH')
+        if matched_path:
+            environ['PATH_INFO'] = matched_path
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPathMiddleware(app.wsgi_app)
+
 SECRET_KEY = "sk_live_" + "0a76002565" + "2521b2e4961" + "cad6a0e58a69d2a5e27dcfde0fb" + "2abbeb26f98a6d43"
 API_URL = "https://api.blackcatoficial.com"
 
